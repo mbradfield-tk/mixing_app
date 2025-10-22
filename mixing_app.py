@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 
-st.logo("logo.png")
+st.logo("assets/logo.png")
 
 # create pages
 main_pg = st.Page("intro.py", title="Overview", icon="1️⃣")

@@ -4,7 +4,7 @@ import functions as fx
 
 st.title("Bourne Protocol")
 
-st.image("bourne_protocol.png", use_container_width=False,
+st.image("assets/bourne_protocol.png", use_container_width=False,
          width=300)
 
 def reset_bourne_protocol():
@@ -42,7 +42,7 @@ if not st.session_state.step_1_done:
 
     with tab1:
 
-        st.image("bourne_1.png", use_container_width=False,
+        st.image("assets/bourne_1.png", use_container_width=False,
             width=50)
         
         st.header("Stir Speed Sensitivity")
@@ -118,7 +118,7 @@ if not st.session_state.step_2_done:
 
     with tab2:
         
-        st.image("bourne_2.png", use_container_width=False,
+        st.image("assets/bourne_2.png", use_container_width=False,
             width=50)
 
         st.header("Feed Rate Sensitivity")
@@ -178,7 +178,7 @@ if not st.session_state.step_3_done:
 
     with tab3:
         
-        st.image("bourne_3.png", use_container_width=False,
+        st.image("assets/bourne_3.png", use_container_width=False,
             width=50)
 
         st.header("Feed Location Sensitivity")
