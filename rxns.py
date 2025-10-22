@@ -5,6 +5,12 @@ import functions as f
 
 st.header("Reaction Browser")
 
+# define reaction rate data
+if 'rxn_rate' not in st.session_state:
+    st.session_state.rxn_rate = {}
+    st.session_state.rxn_rate['no_reagents'] = 1
+    st.session_state.rxn_rate['k'] = 10
+
 rxns = st.session_state['reactions_df'].copy()
 
 reaction = st.selectbox("Select the reaction type:", rxns["Reaction Type"].unique())

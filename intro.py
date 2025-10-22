@@ -9,5 +9,5 @@ version = 0.1
 
 st.title("Mixing Scale-Up Tool")
 st.badge(f"Version {version}")
-st.image("mix_effect.jpg", use_container_width=True,
+st.image("mix_effect.jpg", use_container_width=False,
          width=400)
