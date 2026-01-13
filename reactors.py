@@ -11,16 +11,21 @@ col1, col2 = st.columns(2)
 # get global variables needed here
 # l = st.session_state.all_liq_props
 all_props = st.session_state.mixture
-# convert dataframe entry to dict for easier accessing
-mix = all_props[all_props["Compound"] == "Mixture"].to_dict('records')[0]
-
-if "Solid" in all_props["Phase"].values:
-    s = all_props[all_props["Phase"] == "Solid"].iloc[0].to_dict()
 
 if 'reactor' in st.session_state:
     r = st.session_state.reactor
 else:
     r = {}
+
+# convert dataframe entry to dict for easier accessing
+try:
+    mix = all_props[all_props["Compound"] == "Mixture"].to_dict('records')[0]
+except:
+    mix = {}
+    st.warning("No mixture properties found. Please check inputs.")
+
+if "Solid" in all_props["Phase"].values:
+    s = all_props[all_props["Phase"] == "Solid"].iloc[0].to_dict()
 
 df_reactors = st.session_state['reactors_df'].copy()
 

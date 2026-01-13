@@ -5,12 +5,14 @@ import plotly.express as px
 import functions as f
 import math
 
-st.logo("logo.png")
+st.logo("assets/logo.png")
 st.header("Mixing Calculations")
 
 # get global variables needed here
 all_props = st.session_state.mixture
 mix = all_props[all_props["Compound"] == "Mixture"].to_dict('records')[0]
+st.write(mix)
+
 
 if "Solid" in all_props["Phase"].values:
     s = all_props[all_props["Phase"] == "Solid"].to_dict('records')[0]
@@ -20,6 +22,7 @@ else:
     st.warning("No solids found in mixture. Dependent calcs will return errors.")
 
 r = st.session_state.reactor
+rxn = st.session_state.rxn_rate
 
 # compile mixing case and add to report
 def add_case():
@@ -190,8 +193,28 @@ def format_k(value):
 
 Re_str = format_k(Re)
 
-res1.metric("Reynolds", Re_str, delta=f"{flow_regime}"
-            , border=True, delta_color="off")
+res1.metric("Reynolds", Re_str, delta=f"{flow_regime}",
+            border=True, delta_color="off")
+
+# ************* FREE-SURFACE GAS-LIQUID MASS TRANSFER *************
+
+# calculate impeller power input [W]
+P_imp = f.power_input(r[("Impeller 1 Np", "-")], rho_L, Nsp, impeller_diameter)
+
+# kla = A(P/M)^B = f(A,B,P,M)
+kla_agitation = f.kLa_gas_drawdown(0.07, 0.53, P_imp, mix[("Mass", "kg")])
+res2.metric("kLa (free-surface) (1/s)", f"{kla_agitation:.3f}", delta="Based on agitation only",
+        border=True, delta_color="off")
+
+# ************* DAMKOHLER NUMBERS *************
+
+# (1) reaction rate vs convective mixing
+
+# (2) reaction rate vs mass transfer
+Da_2 = rxn['r_rxn'] / kla_agitation
+Da_2_result = "Mass Transfer Limited" if Da_2 > 10 else "Kinetically Limited" if Da_2 < 0.1 else "Intermediate"
+res3.metric("Da II (reaction/mass transfer)", f"{Da_2:.3f}", delta=f"{Da_2_result}",
+        border=True, delta_color="off")
 
 # ************* GAS DRAWDOWN *************
 

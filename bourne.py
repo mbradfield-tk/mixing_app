@@ -4,8 +4,7 @@ import functions as fx
 
 st.title("Bourne Protocol")
 
-st.image("assets/bourne_protocol.png", use_container_width=False,
-         width=300)
+st.image("assets/bourne_protocol.png", width=400) # "content"
 
 def reset_bourne_protocol():
     st.session_state.bourne_1_result = False
@@ -35,15 +34,19 @@ if 'step_2_done' not in st.session_state:
 if 'step_3_done' not in st.session_state:
     st.session_state.step_3_done = False
 
+# track active tab to prevent streamlit from defaulting to first tab
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = 0
+
+# tabs for each protocol step
 tab1, tab2, tab3 = st.tabs(["Step 1", "Step 2", "Step 3"])
 
-
+# execute steps in order; check if Step 1 is done
 if not st.session_state.step_1_done:
 
     with tab1:
 
-        st.image("assets/bourne_1.png", use_container_width=False,
-            width=50)
+        st.image("assets/bourne_1.png", width=50)
         
         st.header("Stir Speed Sensitivity")
 
@@ -108,25 +111,27 @@ if not st.session_state.step_1_done:
 
         st.button("Run Step 1", on_click=bourne_1_update)
 
+# step 1 done
 else:
 
     with tab1:
-        st.markdown("### Step 1 Completed")
-        st.data_editor(st.session_state.bourne_1, num_rows="fixed")
+        st.metric("Step 1 Result", "Mixing Sensitive" if st.session_state.bourne_1_result else "Not Mixing Sensitive",
+                  border=True)
+        st.data_editor(st.session_state.bourne_1_conditions, num_rows="fixed")
+        # ensure active tab remains on step 2
 
 if not st.session_state.step_2_done:
 
     with tab2:
         
-        st.image("assets/bourne_2.png", use_container_width=False,
-            width=50)
+        st.image("assets/bourne_2.png", width=50)
 
         st.header("Feed Rate Sensitivity")
 
         col1, col2 = st.columns(2)
 
         # get centerpoint conditions
-        feed_mid = float(col1.text_input("Centerpoint Feed Rate [rpm]", f"{0.1}"))
+        feed_mid = float(col1.text_input("Centerpoint Feed Rate (Q) [kg/h]", f"{0.1}"))
 
         feed_factor = 3
 
@@ -168,18 +173,20 @@ if not st.session_state.step_2_done:
 
         st.button("Run Step 2", on_click=bourne_2_update)
 
+# step 2 done
 else:
     
     with tab2:
-        st.markdown("### Step 2 Completed")
+        st.metric("Step 2 Result", "Meso-/Macromixing Sensitive" if st.session_state.bourne_2_result else "Micromixing Sensitive",
+                  border=True)
         st.data_editor(st.session_state.bourne_2_conditions, num_rows="fixed")
+        st.session_state.active_tab = 3
 
 if not st.session_state.step_3_done:
 
     with tab3:
         
-        st.image("assets/bourne_3.png", use_container_width=False,
-            width=50)
+        st.image("assets/bourne_3.png", width=50)
 
         st.header("Feed Location Sensitivity")
 
@@ -215,9 +222,11 @@ if not st.session_state.step_3_done:
 
         st.button("Run Step 3", on_click=bourne_3_update)
 
+# step 3 done
 else:
     
     with tab3:
-        st.markdown("### Step 3 Completed")
+        st.metric("Step 3 Result", "Mesomixing Sensitive" if st.session_state.bourne_3_result else "Macromixing Sensitive",
+                  border=True)
         st.data_editor(st.session_state.bourne_3_conditions, num_rows="fixed")
 
