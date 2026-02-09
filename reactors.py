@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import plotly.express as px
 import functions as f
 
 st.header("Reactor Selection")
@@ -27,7 +28,10 @@ except:
 if "Solid" in all_props["Phase"].values:
     s = all_props[all_props["Phase"] == "Solid"].iloc[0].to_dict()
 
+# get reactors dataframe
 df_reactors = st.session_state['reactors_df'].copy()
+# get kla data
+df_kla = st.session_state['data_kla_df'].copy()
 
 owners = df_reactors["owner"].unique().tolist()
 
@@ -41,8 +45,17 @@ else:
     owner_idx = 0
     reactor_idx = 0
 
-owner = col1.selectbox("Select owner/location:", df_reactors["owner"].unique(), index=owner_idx)
-reactor = col2.selectbox("Select reactor:", df_reactors[df_reactors["owner"]==owner]["reactor"].unique(), index=reactor_idx)
+owner = col1.selectbox("Select owner/location:", df_reactors["owner"].unique(),
+                       index=owner_idx)
+
+# select current reactor or default to first one (happens when Owner changes)
+if len(r) > 0 and r[("Owner", "-")] == owner:
+    reactor = col2.selectbox("Select reactor:", df_reactors[df_reactors["owner"]==owner]["reactor"].unique(),
+                            index=reactor_idx)
+else:
+    reactor = col2.selectbox("Select reactor:", df_reactors[df_reactors["owner"]==owner]["reactor"].unique())
+
+df_kla_selection = df_kla[(df_kla["owner"]==owner) & (df_kla["reactor"]==reactor)].copy()
 
 selected_vessel_name = f"{owner} - {reactor}"
 
@@ -101,6 +114,9 @@ else:
 
 col2.metric("Liquid Volume [L]", f"{r[('Liquid Volume', 'L')]:.{n_dec}f}")
 
+if r[('Liquid Volume', 'L')] > r[("Volume Max", "L")]:
+    st.warning("Warning: Liquid volume exceeds maximum vessel capacity!")
+
 r[("Impellers submerged", "")] = 0
 for i in range(1, int(r[("Impeller Count", "#")])+1):
     # check if level above clearance plus half blade height
@@ -111,6 +127,36 @@ st.dataframe(r)
 
 # set reactor properties as global variable
 st.session_state.reactor = r.copy()
+
+# ************* Display CAD Renderings *************
+# get file path for isometric rendering based on selection
+for pic in ["iso", "side"]:
+    file_path_iso = f"{'assets/reactors/'}{owner}_{reactor}_{pic}.png"
+    # display rendering if file exists
+    try:
+        st.image(file_path_iso, caption=f"{selected_vessel_name} {pic} view")
+    except:
+        st.warning(f"No {pic} rendering found for {selected_vessel_name}.")
+
+
+# ************* PLOT HYDRODYNAMICS FROM DATA/MODELS *************
+st.subheader("Vessel Hydrodynamics")
+
+# plot kLa for each fill volume
+if not df_kla_selection.empty:
+    fig_kla = px.scatter(df_kla_selection, x="stir_speed_rpm", y="kLa_per_sec", color="volume_fill_L",
+                         title=f"kLa Data for {selected_vessel_name}",
+                         labels={"stir_speed_rpm": "Agitation Speed (rpm)",
+                                 "kLa_per_sec": "kLa (1/s)",
+                                 "volume_fill_L": "Fill Volume (L)"},
+                        color_continuous_scale="Turbo",
+                        size_max=10)
+    
+    fig_kla.update_traces(marker=dict(size=10)) 
+
+    fig_kla.update_layout(legend_title_text='Fill Volume (L)')
+
+    st.plotly_chart(fig_kla, use_container_width=True)
 
 #  ************* DRAW VESSEL SCHEMATIC *************
 

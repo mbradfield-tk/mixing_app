@@ -55,6 +55,10 @@ rho_L = mix[("Density", "kg/m3")]
 V_l = mix[("Volume", "L")]
 # stir speed [rpm]
 Nsp = r[("Impeller Speed", "rpm")]
+# tank diameter [m]
+T = r[("Internal Diameter", "m")]
+# liquid height [m]
+H = r[("Liquid Height", "m")]
 
 # get solids properties
 try:
@@ -176,11 +180,11 @@ res3.metric("Impeller Speed (rpm)", f"{Nsp:.0f}", delta=f"{rpm_frac_max:.0f}% to
 Re = f.Re_STR(rho_L, impeller_diameter, Nsp, mu)
 
 if Re >= 10_000:
-    flow_regime= "🟢 Turbulent"
+    flow_regime= "Turbulent"
 elif Re < 10_000 and Re >= 10:
-    flow_regime = "🟡 Transitional"
+    flow_regime = "Transitional"
 else:
-    flow_regime = "🔴 Laminar"
+    flow_regime = "Laminar"
 
 # format Re values
 def format_k(value):
@@ -199,6 +203,7 @@ res1.metric("Reynolds", Re_str, delta=f"{flow_regime}",
 # ************* FREE-SURFACE GAS-LIQUID MASS TRANSFER *************
 
 # calculate impeller power input [W]
+# TODO: sum power for multiple impellers
 P_imp = f.power_input(r[("Impeller 1 Np", "-")], rho_L, Nsp, impeller_diameter)
 
 # kla = A(P/M)^B = f(A,B,P,M)
@@ -244,6 +249,35 @@ if gas_drawdown:
     res2.metric("Nmin Gassing (rpm)", f"{round(Nmin_gd, 0):.0f}",
                 delta=f"{Nmin_gd_delta:.0f}% {gassing_cond}",
                 border=True)
+
+# *************** MIXING TIMES ***************
+eps = P_imp / (mix[("Mass", "kg")])  # power per unit mass [W/kg]
+
+# calculate bulk mixing time at selected stir speed [s]
+tm_bulk = f.tm2(H, T, impeller_diameter, V_l/1e3,
+                eps, mu=mu/1000, rho_L=rho_L, regime=flow_regime)
+
+# calculate micro-mixing rate [1/s]
+tau_micro = f.micro_mixing_rate(eps, nu)
+
+# calculate micro-mixing time [s]
+tm_micro = 1 / tau_micro
+
+res1.metric("Agitator Power [W]", f"{P_imp:.2f}", delta=f"",
+            border=True, delta_color="off")
+
+res2.metric("Mixing Time (bulk) [s]", f"{tm_bulk:.2f}", delta="",
+            border=True)
+
+res3.metric("Micro-mixing Time [s]", f"{tm_micro:.2f}", delta="",
+            border=True)
+
+# TODO: circulation time (TODO: max flow calc)
+# TODO: local mixing constant
+
+# *************** SCAN FOR TRANSITION SCALE ***************
+# TODO: calculate when mixing time becomes an issue
+
 
 # *************** PLOTS ***************
 

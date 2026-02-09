@@ -10,7 +10,7 @@ def dish_volume(r):
         C = 1/2
     elif dish == "Hemispherical":
         C = 1
-    elif dish == "ASME Torispherical":
+    elif dish == "ASME Torispherical" or dish == "Torispherical":
         t = r[('Wall Thickness', 'mm')]/1e3
         Do = r[('Outside Diameter', 'm')]
         Rk = r[('Knuckle Radius', 'm')]
@@ -36,17 +36,8 @@ def Re_STR(p,d,N,mu):
     '''
     return p*(N/60)*(d**2)/(mu/1000)
 
-# Mixing time [s]
-def tm1(Km,V,N,D):
-    '''
-    Km: mixing constant
-    V: liquid volume [L]
-    N: impeller speed [rpm]
-    D: impeller diameter [m]
-    '''
-    return Km*(V/1000)*(N/60)**(-1/3)*D**(-5)
-
 # Impeller power input; P = Po rho_L N^3 D^5 [W]
+# This is per impeller; sum all powers for multiple impellers
 def power_input(Po, rho_L, N, D):
     '''
     Po: impeller power [W]
@@ -56,19 +47,29 @@ def power_input(Po, rho_L, N, D):
     '''
     return Po * rho_L * (N/60)**3 * D**5
 
+# Mixing time [s]
+def tm1(Km, V, N, D):
+    '''
+    Km: mixing constant
+    V: liquid volume [L]
+    N: impeller speed [rpm]
+    D: impeller diameter [m]
+    '''
+    return Km*(V/1000)*(N/60)**(-1/3)*D**(-5)
+
 # Mixing time (from Dynochem) [s]
 def tm2(H, T, D, V, eps, mu, rho_L, regime="Turbulent"):
     '''
     H: height of liquid [m]
     T: tank diameter [m]
     D: impeller diameter [m]
-    V: liquid volume [L]
+    V: liquid volume [m3]
     eps: power per unit volume (kW/m3)
     '''
     if regime == "Turbulent":
         # tmix = C1 eps^(-1/3) (T/D)^1/3 T ^2/3
         # calculate constant; 5.4(H/T)^1.4/(V/(T^2H))^1/3
-        C = 5.4 * (H/T)**1.4 / (V/(T**2 * H))**(1/3)
+        C = 5.4 * (H/T)**1.4 / ((V/(T**2 * H))**(1/3))
         tmix = C * eps**(-1/3) * (T/D)**(1/3) * T**(2/3)
 
     elif regime == "Transitional":
@@ -81,6 +82,63 @@ def tm2(H, T, D, V, eps, mu, rho_L, regime="Turbulent"):
         tmix = None
 
     return tmix
+
+# Micro-mixing rate [1/s]
+def micro_mixing_rate(eps, nu):
+    '''
+    Micro-mixing rate. Engulfment model.
+
+    eps: power per unit mass [W/kg]=[m2/s3]
+    nu: kinematic viscosity [m2/s]
+    '''
+    C = 0.05776
+    return C * (eps / nu)**0.5
+
+# kolmogorov length scale [m]
+def kolmogorov_length(eps, nu):
+    '''
+    Kolmogorov time scale
+
+    eps: power per unit mass [W/kg]=[m2/s3]
+    nu: kinematic viscosity [m2/s]
+    '''
+    return (nu**3 / eps)**0.25
+
+# taylor length scale [m]
+
+# vessel average shear rate [1/s]
+def shear_vessel(P, V, mu):
+    '''
+    Vessel average shear rate
+
+    P: power [W]
+    V: volume [m3]
+    mu: viscosity [Pa.s]
+    '''
+    return (P/V/mu)**(1/2)
+
+# impeller average shear rate [1/s]
+def shear_impeller(P, d, mu):
+    '''
+    Impeller average shear rate
+
+    P: power [W]
+    d: impeller diameter [m]
+    mu: viscosity [Pa.s]
+    '''
+    Vimp = (np.pi * d**2/4) * (d/4)
+    return (0.3* P/(Vimp * mu))**(1/2)
+
+# tip speed [m/s]
+def tip_speed(N, d):
+    '''
+    Tip speed
+
+    N: impeller speed [rpm]
+    d: impeller diameter [m]
+    '''
+    return (np.pi * d * N)/60
+
 
 # *************** MASS TRANSFER: G-L GAS DRAWDOWN ***************
 

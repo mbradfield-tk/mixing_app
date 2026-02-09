@@ -33,6 +33,7 @@ try:
     st.session_state['materials_df'] = pd.read_csv("properties/materials.csv")
     st.session_state['reactions_df'] = pd.read_csv("properties/reactions.csv")
     st.session_state['reactors_df'] = pd.read_csv("properties/reactors.csv")
+    st.session_state['data_kla_df'] = pd.read_csv("data/measured_kla.csv")
 except Exception as e:
     st.error(f"Data import error! {e}")
 
