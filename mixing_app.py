@@ -9,7 +9,8 @@ main_pg = st.Page("intro.py", title="Overview", icon="1️⃣")
 system_pg = st.Page("system.py", title="System", icon="2️⃣")
 reactors_pg = st.Page("reactors.py", title="Reactor", icon="3️⃣")
 rxn_pg = st.Page("rxns.py", title="Reactions", icon="4️⃣")
-bourne_pg = st.Page("bourne.py", title="Bourne Protocol", icon="5️⃣")
+# bourne_pg = st.Page("bourne.py", title="Bourne Protocol", icon="5️⃣")
+bourne2_pg = st.Page("bourne2.py", title="Bourne Protocol", icon="5️⃣")
 mixing_pg = st.Page("mixing.py", title="Mixing", icon="6️⃣")
 # results_pg = st.Page("results.py", title="Results", icon="7️⃣")
 report_pg = st.Page("report.py", title="Report", icon="8️⃣")
@@ -20,7 +21,8 @@ pg = st.navigation([main_pg,
                     system_pg,
                     reactors_pg,
                     rxn_pg,
-                    bourne_pg,
+                    # bourne_pg,
+                    bourne2_pg,
                     mixing_pg,
                     report_pg,
                     theory_pg])

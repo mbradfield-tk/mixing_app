@@ -82,7 +82,8 @@ if not st.session_state.step_1_done:
                     'KPI': [None, None, None]}
 
         # if 'bourne_1_conditions' not in st.session_state:
-        st.session_state.bourne_1_conditions = pd.DataFrame(conditions, index=[f"{1/PV_factor} P/V", "P/V", f"{PV_factor} P/V"])
+        st.session_state.bourne_1_conditions = pd.DataFrame(conditions, index=[f"{1/PV_factor} P/V",
+                                                                               "P/V", f"{PV_factor} P/V"])
 
         # function to execute Step 1 of protocol
         def bourne_1_update():
@@ -126,7 +127,7 @@ if not st.session_state.step_2_done:
         
         st.image("assets/bourne_2.png", width=50)
 
-        st.header("Feed Rate Sensitivity")
+        st.subheader("Feed Rate Sensitivity")
 
         col1, col2 = st.columns(2)
 
@@ -188,7 +189,7 @@ if not st.session_state.step_3_done:
         
         st.image("assets/bourne_3.png", width=50)
 
-        st.header("Feed Location Sensitivity")
+        st.subheader("Feed Location Sensitivity")
 
         rpm_mid = st.session_state.bourne_rpm
         V_mid = st.session_state.bourne_volume
