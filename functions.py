@@ -22,7 +22,6 @@ def dish_volume(r):
 
     return (Di**3 * C * np.pi / 12)
 
-
 # ************************FLUID DYNAMICS ************************
 
 # Reynolds number [-]
@@ -40,7 +39,9 @@ def Re_STR(p,d,N,mu):
 # This is per impeller; sum all powers for multiple impellers
 def power_input(Po, rho_L, N, D):
     '''
-    Po: impeller power [W]
+    Power input by impeller [W]
+    ---
+    Po: impeller power number [-]
     rho_L: liquid density [kg/m3]
     N: impeller speed [rps]
     D: impeller diameter [m]
@@ -162,11 +163,11 @@ def Nmin_gas_drawdown(D, H_sub, gassing_system="vortexing", g=9.81):
 
 def kLa_gas_drawdown(A, b, P, M):
     '''
-    kLa correlation for gas-liquid mass transfer from headspace.
+    kLa [1/s] correlation for gas-liquid mass transfer from headspace.
     Using only power input.
 
-    A: Empirical constant
-    b: Empirical constant
+    A: Empirical constant [-]
+    b: Empirical constant [-]
     P: Power [W]
     M: Liquid mass [kg]
 

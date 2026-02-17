@@ -1,9 +1,11 @@
+import os
 import streamlit as st
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 import plotly.express as px
 import functions as f
+import pandas as pd
 
 st.header("Reactor Selection")
 
@@ -32,7 +34,7 @@ if "Solid" in all_props["Phase"].values:
 df_reactors = st.session_state['reactors_df'].copy()
 # get kla data
 df_kla = st.session_state['data_kla_df'].copy()
-
+# get list of reactor owners/CMOs
 owners = df_reactors["owner"].unique().tolist()
 
 # get current selection of owner>reactor if available
@@ -80,6 +82,32 @@ r[("Owner", "-")] = owner
 r[("Reactor", "-")] = reactor
 r[('Impeller Speed', 'rpm')] = rpm
 
+min_lst = [('Internal Diameter', 'm'),
+('Height (tan-tan)', 'm'),
+('Bottom Dish Type', '-'),
+('Impeller Count', '#'),
+('Top Dish Type', '-'),
+('Agitation Min', 'rpm'),
+('Agitation Max', 'rpm'),
+('Impeller 1 Diameter', 'm'),
+('Impeller 1 Clearance', 'm'),
+('Impeller 1 Height', 'm'),
+('Zwietering S parameter', '-'),
+('GMB z parameter', '-'),
+('Volume Min', 'L'),
+('Volume Max', 'L'),
+('Impeller 1 Np', '-')]
+
+# check if any of the minimum required properties have a null value in the dict
+try:
+    for key in min_lst:
+        if (r[key] == '') or (r[key] is None) or (pd.isna(r[key])):
+            st.error(f"Error: Missing value for {key[0]} ({key[1]}). Please check reactor properties.")
+            st.stop()
+except KeyError as e:
+    st.error(f"Error: Missing property {e} in reactor data. Please check data file.")
+    st.stop()
+
 # ensure type float where possible
 for key, value in r.items():
     try:
@@ -90,11 +118,13 @@ for key, value in r.items():
 # calculate dish volume [m3]
 r[('Dish Volume', 'm3')] = f.dish_volume(r)
 
+# easy variable names
 D = r[('Internal Diameter', 'm')]
 H = r[('Height (tan-tan)', 'm')]
 bottom_dish = r[('Bottom Dish Type', '-')]
 top_dish = r[('Top Dish Type', '-')]
 
+# get fill volume from defined mixture
 r[('Liquid Volume', 'L')] = mix[('Volume', 'L')]
 
 # cylinder cross sectional area [m2]
@@ -123,7 +153,13 @@ for i in range(1, int(r[("Impeller Count", "#")])+1):
     if (r[(f"Impeller {i} Clearance", "m")] + r[(f"Impeller {i} Height", "m")]/2) < r[('Liquid Height', 'm')]:
         r[("Impellers submerged", "")] = i
 
-st.dataframe(r)
+# convert to dataframe for display
+r_df = pd.DataFrame(r.values(), index=pd.MultiIndex.from_tuples(r.keys()), columns=["Value"])
+# sort by category (property type)
+r_df = r_df.sort_index(level=0)
+
+
+st.dataframe(r_df)
 
 # set reactor properties as global variable
 st.session_state.reactor = r.copy()
@@ -139,13 +175,25 @@ for pic in ["iso", "side"]:
         st.warning(f"No {pic} rendering found for {selected_vessel_name}.")
 
 
-# ************* PLOT HYDRODYNAMICS FROM DATA/MODELS *************
+# ************* Plot Hydrodynamics from CFD/Measurements *************
 st.subheader("Vessel Hydrodynamics")
+
+# get CFD images if available
+try:
+    # get all images in CFD folder for this vessel
+    cfd_files = [f for f in os.listdir("assets/CFD/") if f.startswith(f"{owner}_{reactor}")]
+    for cfd_file in cfd_files:
+        st.image(f"assets/CFD/{cfd_file}", caption=f"{cfd_file}",
+                 width=500)
+    if len(cfd_files) == 0:
+        st.warning(f"No CFD images found for {selected_vessel_name}.")
+except:
+    st.warning(f"Failed to import CFD images for {selected_vessel_name}.")
 
 # plot kLa for each fill volume
 if not df_kla_selection.empty:
     fig_kla = px.scatter(df_kla_selection, x="stir_speed_rpm", y="kLa_per_sec", color="volume_fill_L",
-                         title=f"kLa Data for {selected_vessel_name}",
+                         title=f"Measured kLa data for {selected_vessel_name}",
                          labels={"stir_speed_rpm": "Agitation Speed (rpm)",
                                  "kLa_per_sec": "kLa (1/s)",
                                  "volume_fill_L": "Fill Volume (L)"},
@@ -157,6 +205,8 @@ if not df_kla_selection.empty:
     fig_kla.update_layout(legend_title_text='Fill Volume (L)')
 
     st.plotly_chart(fig_kla, use_container_width=True)
+else:
+    st.warning(f"No kLa data found for {selected_vessel_name}.")
 
 #  ************* DRAW VESSEL SCHEMATIC *************
 

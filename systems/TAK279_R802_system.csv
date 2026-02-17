@@ -1,0 +1,5 @@
+﻿Compound,Phase,Volume,Mass,Density,Dynamic Viscosity,Kinematic Viscosity,Surface Tension,Particle Size,Mass Frac.,Volume Frac.
+,,L,kg,kg/m3,mPa.s,m2/s,N/m,um,-,-
+MeOH,Liquid,495,373.725,755,1,1e-06,0.022,,,
+Pd/C,Solid,0.865384615,2.25,2600,,,,15,,
+TR967,Liquid,45,45,1000,,,,,,
