@@ -59,7 +59,7 @@ else:
 
 df_kla_selection = df_kla[(df_kla["owner"]==owner) & (df_kla["reactor"]==reactor)].copy()
 
-selected_vessel_name = f"{owner} - {reactor}"
+selected_vessel_name = f"{owner}-{reactor}"
 
 # define agitation speed [rpm]
 try:
@@ -81,6 +81,7 @@ r = dict(zip(zip(df_selection["property"], df_selection["units"]), df_selection[
 r[("Owner", "-")] = owner
 r[("Reactor", "-")] = reactor
 r[('Impeller Speed', 'rpm')] = rpm
+r[("Name", "-")] = f"{owner}-{reactor}"
 
 min_lst = [('Internal Diameter', 'm'),
 ('Height (tan-tan)', 'm'),

@@ -7,7 +7,6 @@ import numpy as np
 
 # get reactors dataframe
 df_reactors = st.session_state['reactors_df'].copy()
-df_reactors["vessel"] = df_reactors["owner"] + "-" + df_reactors["reactor"]
 
 # get reaction rate data
 rxn_rate = st.session_state['rxn_rate'].copy()
@@ -31,16 +30,16 @@ pilot_reactors = df_reactors[(df_reactors["property"] == "Scale") & (df_reactors
 comm_reactors = df_reactors[(df_reactors["property"] == "Scale") & (df_reactors["value"] == "commercial")].copy()
 
 # select reactor for each scale
-r_lab = col1.selectbox("Select lab reactor:", lab_reactors["vessel"].unique())
-r_pilot = col1.selectbox("Select pilot reactor:", pilot_reactors["vessel"].unique())
-r_commercial = col1.selectbox("Select commercial reactor:", comm_reactors["vessel"].unique())
+r_lab = col1.selectbox("Select lab reactor:", lab_reactors["name"].unique())
+r_pilot = col1.selectbox("Select pilot reactor:", pilot_reactors["name"].unique())
+r_commercial = col1.selectbox("Select commercial reactor:", comm_reactors["name"].unique())
 
 # get reactor properties and add to rScale dict as dict
-rScale["lab"] = df_reactors[df_reactors["vessel"] == r_lab].copy()
+rScale["lab"] = df_reactors[df_reactors["name"] == r_lab].copy()
 rScale["lab"] = dict(zip(zip(rScale["lab"]["property"], rScale["lab"]["units"]), rScale["lab"]["value"]))
-rScale["pilot"] = df_reactors[df_reactors["vessel"] == r_pilot].copy()
+rScale["pilot"] = df_reactors[df_reactors["name"] == r_pilot].copy()
 rScale["pilot"] = dict(zip(zip(rScale["pilot"]["property"], rScale["pilot"]["units"]), rScale["pilot"]["value"]))
-rScale["commercial"] = df_reactors[df_reactors["vessel"] == r_commercial].copy()
+rScale["commercial"] = df_reactors[df_reactors["name"] == r_commercial].copy()
 rScale["commercial"] = dict(zip(zip(rScale["commercial"]["property"], rScale["commercial"]["units"]), rScale["commercial"]["value"]))
 
 # convert to dataframes for display
@@ -107,6 +106,7 @@ def scale_analysis():
         scale_results = pd.DataFrame(scale_results)
         # sort by kla value
         scale_results = scale_results.sort_values(by="kla (1/s)", ascending=True)
+        st.subheader("Gas-Liquid Mass Transfer Analysis")
         # plot kla vs P/M for each scale
         fig = px.line(scale_results, x="P/M (W/kg)", y="kla (1/s)", color="Scale", title=f"Gas-liquid mass transfer coefficient (kla)")
         st.plotly_chart(fig)
@@ -118,10 +118,25 @@ def scale_analysis():
                         annotation_text="Da_1=1 (system is mass transfer limited above line)", annotation_position="top left")
         st.plotly_chart(fig2)
 
+        # find where Da_1 > 1 in dataframe and display table of those conditions
+        mass_transfer_limited = scale_results[scale_results["Da_1"] > 1].copy()
+        st.subheader("Mass Transfer Limited Conditions (Da_1 > 1)")
+        st.dataframe(mass_transfer_limited)
+
+        st.divider()
+        st.subheader("Micromixing Analysis")
+
+        st.divider()
+        st.subheader("Solid-Liquid Mass Transfer Analysis")
+
+# show reaction rate
+st.write(f"Reaction rate: {rxn_rate['r_rxn']:.3f} mol/kg/s")
+
 # may need to use global state for this for results to persist after button click and page changes
 analyse = st.button("Check Scale-dependency")
 
+st.divider()
+
 # to ensure that outputs appear below the button
 if analyse:
-    st.subheader("Scale-dependency Analysis")
     scale_analysis()

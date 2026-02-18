@@ -137,10 +137,10 @@ def import_system():
 def export_mixture_properties():
     st.session_state.mixture.to_csv("mixture_properties.csv", index=False)
 
-st.subheader("System Inputs Table")
-st.write('''Define system components.
-         Add new components by adding a row to the table, then defining the component number
-         and properties, or import an existing system from a file.''')
+# st.subheader("System Inputs Table")
+st.text_area("System Inputs Table",
+             "Add new components by adding a row to the table, then defining the component number and properties, or import an existing system from a file.",
+             height="content")
 
 st.file_uploader("Upload file with system properties", type=["csv"], key="sys_upload",
                  on_change=import_system)
