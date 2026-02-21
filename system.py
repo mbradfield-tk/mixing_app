@@ -12,10 +12,13 @@ phases = ["Solid", "Liquid", "Gas"]
 
 # ******* INPUT TABLE ********
 
+if 'phases' not in st.session_state:
+    st.session_state.phases = None
+
 if 'sys' not in st.session_state:
     initial = {'Compound': 'H2O',
     'Phase': phases[1],
-    'Volume [L]': 1.0,
+    'Volume [L]': 0.065,
     'Mass [kg]': None,
     'Density [kg/m3]': 1000.0,
     'Dynamic Viscosity [mPa.s]': 1.0,
@@ -52,6 +55,7 @@ def create_new_cols(df):
 
 # updates the mixture properties based on inputs table
 def update_mixture():
+
     # complete missing cells
     sys_mod['Mass [kg]'] = np.where(sys_mod['Mass [kg]'].isna(),
                                      (sys_mod['Volume [L]']/1e3)*sys_mod['Density [kg/m3]'],
@@ -64,6 +68,17 @@ def update_mixture():
     sys_mod['Density [kg/m3]'] = np.where(sys_mod['Density [kg/m3]'].isna(),
                                            (sys_mod['Mass [kg]'] / (sys_mod['Volume [L]']/1e3)),
                                            sys_mod['Density [kg/m3]'])
+    
+    # get phases
+    st.session_state.phases = sys_mod['Phase'].unique()
+
+    # check for solids
+    if "Solid" in st.session_state.phases:
+        st.session_state.solid = True
+    else:
+        st.session_state.solid = False
+        # make aprticle size 0 for all rows
+        sys_mod['Particle Size [um]'] = 0.
 
     df_empty_check = sys_mod.replace('', np.nan).isna()
     if df_empty_check.any().any():
@@ -117,7 +132,6 @@ def update_mixture():
     mixture = pd.concat([sys_mod, mixture], axis=0)
 
     # create new column names for mixture by extracting the units from [units] and making a tuple (columns, units)
-
     mixture = create_new_cols(mixture)
 
     # update state variable
@@ -139,7 +153,7 @@ def export_mixture_properties():
 
 # st.subheader("System Inputs Table")
 st.text_area("System Inputs Table",
-             "Add new components by adding a row to the table, then defining the component number and properties, or import an existing system from a file.",
+             "Add new components by adding a row to the table, then defining the component number and properties, or import an existing mixture from a file.",
              height="content")
 
 st.file_uploader("Upload file with system properties", type=["csv"], key="sys_upload",
@@ -155,10 +169,12 @@ sys_mod = st.data_editor(st.session_state.sys,
                         'Volume [L]': st.column_config.NumberColumn(),
                         'Mass [kg]': st.column_config.NumberColumn(),
                         'Dynamic Viscosity [mPa.s]': st.column_config.NumberColumn(),
-                        'Density [kg/m3]': st.column_config.NumberColumn(),
-                        'Kinematic Viscosity [m2/s]': st.column_config.NumberColumn(),
-                        'Surface Tension [N/m]': st.column_config.NumberColumn(),
-                        'Particle Size [um]': st.column_config.NumberColumn()
+                        'Density [kg/m3]': st.column_config.NumberColumn(format="%.0f"),
+                        'Kinematic Viscosity [m2/s]': st.column_config.NumberColumn(format="%.2e"),
+                        'Surface Tension [N/m]': st.column_config.NumberColumn(format="%.2e"),
+                        'Particle Size [um]': st.column_config.NumberColumn(),
+                        'Mass Frac. [-]': st.column_config.NumberColumn(format="%.3f"),
+                        'Volume Frac. [-]': st.column_config.NumberColumn(format="%.3f")
                     }
                 )
 
@@ -166,7 +182,34 @@ st.button("Update Mixture", on_click=update_mixture)
 
 st.subheader("Mixture Properties")
 
-st.dataframe(st.session_state.mixture)
+# create badges for each phases and display all badges on same row
+if st.session_state.phases is not None:
+    cols = len(st.session_state.phases)
+    badge_cols = st.columns(cols, width=120)
+
+    for i, phase in enumerate(st.session_state.phases):
+        if phase == "Solid":
+            badge_cols[i].badge(phase, color="orange")
+        elif phase == "Liquid":
+            badge_cols[i].badge(phase, color="blue")
+        elif phase == "Gas":
+            badge_cols[i].badge(phase, color="green")
+
+st.dataframe(st.session_state.mixture, hide_index=True, width="stretch",
+             column_config={
+                 1: st.column_config.TextColumn(), # ('Compound', '')
+                 2: st.column_config.TextColumn(), # ('Phase', '')
+                 3: st.column_config.NumberColumn(format="%.1e"), # ('Volume', 'L')
+                 4: st.column_config.NumberColumn(format="%.1e"), # ('Mass', 'kg')
+                 5: st.column_config.NumberColumn(format="%.0f"), # ('Density', 'kg/m3')
+                 6: st.column_config.NumberColumn(), # ('Dynamic Viscosity', 'mPa.s')
+                 7: st.column_config.NumberColumn(format="%.1e"), # ('Kinematic Viscosity', 'm2/s')
+                 8: st.column_config.NumberColumn(format="%.1e"), # ('Surface Tension', 'N/m')
+                 9: st.column_config.NumberColumn(), # ('Particle Size', 'um')
+                 10: st.column_config.NumberColumn(format="%.2f"), # ('Mass Frac.', '-')
+                 11: st.column_config.NumberColumn(format="%.2f") # ('Volume Frac.', '-')
+             }
+            )
 
 st.button("Export Properties", on_click=export_mixture_properties)
 

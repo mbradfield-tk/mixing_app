@@ -12,7 +12,6 @@ st.header("Reactor Selection")
 col1, col2 = st.columns(2)
 
 # get global variables needed here
-# l = st.session_state.all_liq_props
 all_props = st.session_state.mixture
 
 if 'reactor' in st.session_state:
@@ -44,18 +43,17 @@ if len(r) > 0:
     reactors = df_reactors[df_reactors["owner"]==owner]["reactor"].unique().tolist()
     reactor_idx = reactors.index(r[("Reactor", "-")])
 else:
-    owner_idx = 0
-    reactor_idx = 0
+    default_owner = "Takeda"
+    owner_idx = owners.index(default_owner) if default_owner in owners else 0
+    default_reactor = "EasyMax 102 Pressure"
+    reactors = df_reactors[df_reactors["owner"]==default_owner]["reactor"].unique().tolist()
+    reactor_idx = reactors.index(default_reactor) if default_reactor in reactors else 0
 
 owner = col1.selectbox("Select owner/location:", df_reactors["owner"].unique(),
                        index=owner_idx)
 
-# select current reactor or default to first one (happens when Owner changes)
-if len(r) > 0 and r[("Owner", "-")] == owner:
-    reactor = col2.selectbox("Select reactor:", df_reactors[df_reactors["owner"]==owner]["reactor"].unique(),
-                            index=reactor_idx)
-else:
-    reactor = col2.selectbox("Select reactor:", df_reactors[df_reactors["owner"]==owner]["reactor"].unique())
+reactor = col2.selectbox("Select reactor:", df_reactors[df_reactors["owner"]==owner]["reactor"].unique(),
+                        index=reactor_idx)
 
 df_kla_selection = df_kla[(df_kla["owner"]==owner) & (df_kla["reactor"]==reactor)].copy()
 
@@ -171,7 +169,9 @@ for pic in ["iso", "side"]:
     file_path_iso = f"{'assets/reactors/'}{owner}_{reactor}_{pic}.png"
     # display rendering if file exists
     try:
-        st.image(file_path_iso, caption=f"{selected_vessel_name} {pic} view")
+        st.image(file_path_iso,
+                 caption=f"{selected_vessel_name} {pic} view",
+                 width=250)
     except:
         st.warning(f"No {pic} rendering found for {selected_vessel_name}.")
 
@@ -185,7 +185,7 @@ try:
     cfd_files = [f for f in os.listdir("assets/CFD/") if f.startswith(f"{owner}_{reactor}")]
     for cfd_file in cfd_files:
         st.image(f"assets/CFD/{cfd_file}", caption=f"{cfd_file}",
-                 width=500)
+                 width=300)
     if len(cfd_files) == 0:
         st.warning(f"No CFD images found for {selected_vessel_name}.")
 except:

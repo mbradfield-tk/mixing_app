@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import functions as fx
-import inspect
+# import inspect
+import plotly.express as px
 
 st.title("Bourne Protocol")
 
@@ -179,6 +180,11 @@ if st.session_state.bourne_1_done:
               "Mixing Sensitive" if st.session_state.bourne_1_result else "Not Mixing Sensitive",
               border=True)
     
+    # plot KPI vs P/V
+    fig = px.line(st.session_state.bourne_1_conditions.reset_index(),
+                  x="Agitation [rpm]", y="KPI", title="KPI vs Stir Speed (rpm)")
+    st.plotly_chart(fig)
+    
 st.divider()
     
 # ************************ STEP 2 ************************
@@ -251,6 +257,11 @@ if st.session_state.bourne_2_done:
     st.metric("Step 2 Result",
               "Meso-/Macromixing Sensitive" if st.session_state.bourne_2_result else "Micromixing Sensitive",
             border=True)
+    
+    # plot KPI vs Feed Rate
+    fig = px.line(st.session_state.bourne_2_conditions.reset_index(),
+                  x="Feed Rate [kg/h]", y="KPI", title="KPI vs Feed Rate (kg/h)")
+    st.plotly_chart(fig)
 
 st.divider()
 
@@ -312,5 +323,10 @@ if st.session_state.bourne_3_done:
     st.metric("Step 3 Result",
               "Mesomixing Sensitive" if st.session_state.bourne_3_result else "Macromixing Sensitive",
             border=True)
+    
+    # plot KPI vs Feed Location (index of bourne_3_conditions)
+    fig = px.line(st.session_state.bourne_3_conditions.reset_index(),
+                  x=st.session_state.bourne_3_conditions.index, y="KPI", title="KPI vs Feed Location")
+    st.plotly_chart(fig)
     
 st.divider()

@@ -1,21 +1,23 @@
-﻿Reaction Type,Category,Explanation
-Nucleophilic Substitution (SN2),Fast,High kr: (10^6-10^10). Quick one-step mechanism.
-Radical Substitution,Fast,High kr: (10^6-10^10). Involves reactive intermediates.
-Reduction,Fast,High kr: (10^3-10^5). Efficient catalytic process.
-Oxidation (Metal-Catalyzed),Medium,Moderate kr: (100-10^4)Catalyst and substrate-dependent.
-Nucleophilic Addition,Fast,Fast kr: (100-10^5). Usually slower than substitutions.
-SN1 (Nucleophilic Substitution),Fast,Fast kr: (10-1000). Multistep mechanism with carbocation formation.
-Electrophilic Addition,Medium,Moderate kr: (10-100). Common for alkenes.
-Grignard Reaction,Medium,Moderate kr: (10-100). Reactivity depends on reagents.
-Suzuki Coupling,Medium,Moderate kr: (10^(-3)-1). Metal-catalyzed reactions.
-Heck Reaction,Medium,Moderate kr: (10^(-3)-1). Requires palladium catalyst.
-Sonogashira Coupling,Medium,Moderate kr: (10^(-1)-10). Copper or palladium catalyst.
-Michael Addition,Medium,Moderate kr: (10^(-2)-100). Enolate nucleophile-dependent.
-EAS (Electrophilic Aromatic Substitution),Slow,Low kr: ( 10^(-3)-100). Relatively slow due to aromatic stability.
-Cycloaddition (Diels-Alder),Medium,Low kr: (10^(-3)-100). Requires activation energy.
-Aldol Condensation,Slow,"Low kr: (10^(-3)-10^(-1)). Base or acid-catalyzed, with multiple steps."
-Esterification,Slow,Low kr: (10^(-4)-10^(-1)). Reversible and requires a catalyst.
-Transesterification,Slow,Low kr: (10^(-5)-10^(-3)). Slower without catalysis.
-Amidation,Slow,Low kr: (0.01-10). Energy-demanding bond formation.
-Hydrolysis (Acid/Base-Catalyzed),Slow,Low kr: (10^(-6)-10^(-3)). Can be very slow without strong catalysts.
-Decarboxylation,Slow,Low kr: (10^(-6)-10^(-1)). Requires heat or catalysts.
+﻿Reaction,Category,Rate,dH [kJ/mol],Endo/Exo,Rate OoM,Explanation
+Nucleophilic Substitution (SN2),Fast,1.0E+08,-60,Exothermic,8.0,High kr: (10^6-10^10). Quick one-step mechanism.
+Radical Substitution,Fast,1.0E+08,-125,Exothermic,8.0,High kr: (10^6-10^10). Involves reactive intermediates.
+Reduction,Fast,1.0E+04,-200,Exothermic,4.0,High kr: (10^3-10^5). Efficient catalytic process.
+Oxidation (Metal-Catalyzed),Medium,1.0E+03,-150,Exothermic,3.0,Moderate kr: (100-10^4)Catalyst and substrate-dependent.
+Nucleophilic Addition,Fast,3.2E+03,-85,Exothermic,3.5,Fast kr: (100-10^5). Usually slower than substitutions.
+SN1 (Nucleophilic Substitution),Fast,1.0E+02,-55,Exothermic,2.0,Fast kr: (10-1000). Multistep mechanism with carbocation formation.
+Electrophilic Addition,Medium,3.2E+01,-125,Exothermic,1.5,Moderate kr: (10-100). Common for alkenes.
+Grignard Reaction,Medium,3.2E+01,-200,Exothermic,1.5,Moderate kr: (10-100). Reactivity depends on reagents.
+Suzuki Coupling,Medium,1.0E-01,-100,Exothermic,-1.0,Moderate kr: (10^(-3)-1). Metal-catalyzed reactions.
+Heck Reaction,Medium,1.0E-01,-100,Exothermic,-1.0,Moderate kr: (10^(-3)-1). Requires palladium catalyst.
+Sonogashira Coupling,Medium,1.0E+00,-100,Exothermic,0.0,Moderate kr: (10^(-1)-10). Copper or palladium catalyst.
+Michael Addition,Medium,1.0E+00,-60,Exothermic,0.0,Moderate kr: (10^(-2)-100). Enolate nucleophile-dependent.
+EAS (Electrophilic Aromatic Substitution),Slow,3.2E-01,-125,Exothermic,-0.5,Low kr: ( 10^(-3)-100). Relatively slow due to aromatic stability.
+Cycloaddition (Diels-Alder),Medium,3.2E-01,-125,Exothermic,-0.5,Low kr: (10^(-3)-100). Requires activation energy.
+Aldol Condensation,Slow,1.0E-02,-60,Exothermic,-2.0,"Low kr: (10^(-3)-10^(-1)). Base or acid-catalyzed, with multiple steps."
+Esterification,Slow,3.2E-03,-100,Exothermic,-2.5,Low kr: (10^(-4)-10^(-1)). Reversible and requires a catalyst.
+Transesterification,Slow,1.0E-04,35,Endothermic,-4.0,Low kr: (10^(-5)-10^(-3)). Slower without catalysis.
+Amidation,Slow,3.2E-01,-125,Exothermic,-0.5,Low kr: (0.01-10). Energy-demanding bond formation.
+Hydrolysis (Acid/Base-Catalyzed),Slow,3.2E-05,-60,Exothermic,-4.5,Low kr: (10^(-6)-10^(-3)). Can be very slow without strong catalysts.
+Decarboxylation,Slow,3.2E-04,125,Endothermic,-3.5,Low kr: (10^(-6)-10^(-1)). Requires heat or catalysts.
+TAK-279 Step 1 Debenzylation 1,Fast,1.0E+02,-100,Exothermic,2,Estimated from kinetic experiments
+TAK-279 Step 1 Debenzylation 2,Slow,1.0E-02,-100,Exothermic,-2,Estimated from kinetic experiments

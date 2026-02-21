@@ -84,7 +84,7 @@ Nalas,EasyMax 102,Height (tan-tan),m,0.088,
 Nalas,EasyMax 102,Bottom Dish Type,-,Torispherical,0
 Nalas,EasyMax 102,Impeller Count,#,1,
 Nalas,EasyMax 102,Top Dish Type,-,Flat,
-Nalas,EasyMax 102,Agitation Min,rpm,0,
+Nalas,EasyMax 102,Agitation Min,rpm,50,
 Nalas,EasyMax 102,Agitation Max,rpm,1000,
 Nalas,EasyMax 102,Impeller 1 Diameter,m,0.03,
 Nalas,EasyMax 102,Impeller 1 Clearance,m,0.0101,

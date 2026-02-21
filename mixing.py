@@ -6,14 +6,14 @@ import functions as f
 import math
 
 st.logo("assets/logo.png")
-st.header("Mixing Calculations")
+st.header("Reactor Mixing Calculations")
 
 # get global variables needed here
 all_props = st.session_state.mixture
 mix = all_props[all_props["Compound"] == "Mixture"].to_dict('records')[0]
 st.write(mix)
 
-
+# get solids properties
 if "Solid" in all_props["Phase"].values:
     s = all_props[all_props["Phase"] == "Solid"].to_dict('records')[0]
     s[("Loading", "%")] = s[('Mass','kg')] / mix[('Mass','kg')] * 100
@@ -78,17 +78,18 @@ impellers = int(r[("Impeller Count", "#")])
 impeller_diameters = [float(r[(f"Impeller {i} Diameter", "m")]) for i in range(1, impellers + 1)]
 impeller_clearances = [float(r[(f"Impeller {i} Clearance", "m")]) for i in range(1, impellers + 1)]
 
+# impeller diameter for calculations; use max diameter if multiple impellers
 impeller_diameter = max(impeller_diameters)
 
 # x inputs
 try:
     rpm_min = float(mix1.text_input("Min agitation (rpm)", f"{rpm_min}"))
-except:
-    print("value error!")
+except ValueError:
+    st.error("Invalid input for minimum agitation. Please enter a number.")
 try:
     rpm_max = float(mix2.text_input("Max agitation (rpm)", f"{rpm_max}"))
-except:
-    print("value error!")
+except ValueError:
+    st.error("Invalid input for maximum agitation. Please enter a number.")
 
 # mixing settings
 
